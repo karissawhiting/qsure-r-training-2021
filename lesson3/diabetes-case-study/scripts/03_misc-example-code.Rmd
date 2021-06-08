@@ -1,0 +1,96 @@
+---
+title: "Examples of Other Modeling Methods"
+author: "Karissa Whiting"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: sandstone
+    toc: yes
+    toc_float: yes
+fontsize: 12pt
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(gtsummary)
+library(gt)
+library(labelled)
+library(here)
+library(survival)
+library(survminer)
+
+data(lung)
+
+set_gtsummary_theme(theme_gtsummary_compact())
+```
+
+# Survival Analysis
+
+Check out this tutorial for more in-depth information about survival analysis in R: https://www.emilyzabor.com/tutorials/survival_analysis_in_r_tutorial.html
+
+
+```{r}
+
+# recode the endpoint so 0 is censored and 1 is death
+lung <- lung %>%
+  mutate(status = 
+      case_when(status == 1 ~ 0, 
+        status == 2 ~ 1, 
+        TRUE ~ status)) %>%
+  mutate(sex = case_when(
+    sex == 1 ~ "Male", 
+    sex == 2 ~ "Female"))
+```
+
+## Kaplan Meier Curves
+
+```{r}
+fit <- survfit(Surv(time, status) ~ sex,
+  data = lung)
+
+fit %>%
+  ggsurvplot(data = lung,
+    risk.table = TRUE, 
+    tables.y.text = FALSE, 
+    legend.labs = c("Female", "Male"))
+
+```
+
+<br>
+
+```{r}
+fit %>%
+  tbl_survfit(probs = .5)
+```
+
+## Cox Proportional Hazards Models
+
+```{r }
+lung %>%
+  # remove institution variable and other
+  select(-inst, -ph.karno) %>%
+  
+  tbl_uvregression(method = coxph,
+    y = Surv(time, status), 
+    exponentiate = TRUE) %>%
+  as_gt() %>%
+  tab_header("Univariate Cox Models")
+
+```
+
+# Linear Mixed Effects Models
+
+```{r}
+library(lme4, warn.conflicts = FALSE, quietly = TRUE)
+
+tbl_regression_ex3 <-
+  glmer(am ~ hp + (1 | gear), mtcars, family = binomial) %>%
+  tbl_regression(exponentiate = TRUE)
+
+tbl_regression_ex3
+```
+
