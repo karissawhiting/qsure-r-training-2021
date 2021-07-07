@@ -1,0 +1,504 @@
+
+<style>
+.small-code pre code {
+  font-size: 1em;
+}
+</style>
+
+```{r setup, include=FALSE}
+opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+  
+QSURE R Training 2021: Lesson 1
+========================================================
+author: Karissa Whiting, Mike Curry
+date: 2021-06-09
+autosize: true
+
+Training Agenda
+========================================================
+
+- **Lesson 1** – 6/9/2021
+    - Intro to R and data types
+    - Intro to tidyverse  
+- **Lesson 2** - 6/10/2021
+    - R Markdown
+    - Plotting
+    - Making tables/summarizing results
+- **Lesson 3?** - TBD
+    - Project organization/reproducibility
+    - Coding case study
+    - Github
+
+<br>
+* After lessons, reach out to Mike and I anytime on teams/email if you have questions!
+
+
+R, Rstudio, Open source philosophy
+========================================================
+
+- **R** is an object-oriented **open-source** programming language used mostly for statistical computing and graphics
+
+- **Open source** means the original source code is freely available, and can be distributed and modified. Also, users can contribute to the usefulness by creating packages, which implement specialized functions for all kinds of uses (e.g. statistical methods, graphical capabilities, reporting tools). 
+Added Bonus: vibrant R community!
+
+- **RStudio** is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting code editor that supports direct code execution, as well as tools for plotting, history, debugging and work space management.
+
+
+====================================
+
+<center>
+![alt text](r-cars.jpg)
+</center>
+
+R Basics: General Things
+========================================================
+
+- `<-` is the assignment operator (`=` also works)
+
+```{r}
+v1 <- c(1, 2, 3)
+v1
+```
+
+- `?` is your friend if you want to look at documentation! (e.g. type `?mean()` in the console)
+
+- R is case sensitive, bE cArEfUl!
+
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+
+R basic data types: 
+
+* Logical (`TRUE`)
+* integer (`1`)
+* numeric (a.k.a. double) (`1.2`)
+* character (`"Purple"`)
+* factor ("a")
+* complex (nobody ever uses these really)
+
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+
+R has 5 basic data structures: 
+
+1. vector
+2. matrix
+3. list
+4. array
+5. data.frame
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+
+- vector - only 1 data type allowed
+
+```{r}
+
+# character
+c("apple", "orange")
+
+# numeric
+c(1:20)
+```
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+
+- matrix - 2d, only 1 data type allowed
+
+```{r}
+letters <- c("a","b","c","d", "e", "f")
+matrix(letters, nrow=2, ncol=3)
+```
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+
+- list - any data type allowed
+
+```{r}
+my_list <- list("a", 2, TRUE) 
+str(my_list)
+```
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+class: small-code
+
+- arrays - n-dimensions, of 1 data type
+
+```{r}
+# Create two vectors of different lengths.
+vector1 <- c(5,9,3)
+vector2 <- c(10,11,12,13,14,15)
+
+array(c(vector1,vector2),dim = c(3,3,2))
+```
+
+
+R Basics: Data Structures and Basic Syntax
+========================================================
+class: small-code
+
+5. Data frames (or tibbles)
+    - any data type is allowed, but each column has to have the same type
+    - the most important for data analysts. Most similar to an excel spreadsheet/statistical data file
+
+```{r}
+head(iris, 4)
+```
+
+
+R Basics: Beware Data Type Coercion
+========================================================
+class: small-code
+
+- Since columns of a data.frame must be of the same type, some data may be coerced in unexpected ways when reading in a csv or excel file. 
+
+- character is often the default for mixed data types
+
+```{r, echo  = TRUE}
+
+x <- c("apple", 3)
+str(x)
+
+```
+
+```{r, echo  = TRUE}
+y <- c(3, 2, "twenty") 
+y
+```
+
+```{r, echo  = TRUE}
+#sum(y)
+
+```
+
+
+Exploring Your Data: Read in Your Data
+========================================================
+class: small-code
+
+- The first step in a project is usually to read in your data into your Rstudio environment
+
+- The {readr} and {readxl} packages (part of the tidyverse) have functions that read in excel and csv files with sensible defaults
+
+```{r, eval = FALSE}
+# check out the documentation with 
+?readr::read_csv
+
+readr::read_csv()
+readxl::read_excel(
+  path = "Users/Whiting/raw-data/mydataset_4-3-19.xlsx", 
+  na = c(" ", "NA", "N/A", "NULL"))
+```
+
+Exploring Your Data: Identify Data Types
+========================================================
+
+- `colnames()` - will give you the column names
+- `ncol()` and `nrow()` - will give you the total count of columns and rows respectively
+- `class()`, `str()`, `attributes()` will give you meta-information on the object 
+- `head()`, `tail()` show the top or bottom rows of your df
+- `View()` will show the whole dataframe 
+- `table()` will summarise variables
+
+
+Exploring Your Data: Identify Data Types
+========================================================
+class: small-code
+
+```{r}
+str(iris)
+nrow(iris)
+colnames(iris)
+
+```
+
+Exploring Your Data: Identify Data Types
+========================================================
+class: small-code
+
+```{r}
+class(iris)
+head(iris, 4)
+table(iris$Species)
+```
+
+
+Intro to tidyverse
+========================================================
+
+The tidyverse package is a collection of R packages designed for data analysis, all of which share a similar design, grammar, and structure.
+
+```{r}
+# load it
+library(tidyverse)
+
+# check out the cute logo
+tidyverse_logo()
+
+```
+
+Intro to tidyverse
+========================================================
+
+- readr: data import/export
+- tibble: re-imagined data frames
+- dplyr: data manipulation
+- tidyr: data manipulation
+- ggplot2: graphics and visualization
+- purrr: functional programming toolkit, replaces the need for many loops
+- stringr: string manipulation
+- forcats: re-imagined factor data types
+
+There are several additional packages which are installed as part of the tidyverse, but are not loaded by default.
+
+Intro to tidyverse
+========================================================
+
+Overall tidyverse helps with code readability and has shortcuts for some common data manipulation tasks
+
+tidyverse has been developed and significantly improved in the last few years, with a lot of ongoing work being done to further increase usability.
+
+tidyverse: data cleaning with dplyr 
+========================================================
+
+The dplyr package is a data manipulation and cleaning package. A few of the key functions (verbs) in dplyr are:
+
+- select()
+- mutate()
+- filter()
+- arrange()
+- group_by()
+- summarize()
+
+All take a data frame as input, and return a data frame as output.
+
+Quick Aside: The Pipe Operator (%>%)
+========================================================
+class: small-code
+
+- The pipe (%>%) is included as part of the magrittr package and facilitates passing arguments from one function to another
+
+- The pipe operator takes the information on the left hand side, and provides it as the first argument to the right hand side
+
+```{r}
+
+vals <- c(1:4)
+vals
+
+# no pipe
+round(sqrt(sum(vals)), 3)
+```
+
+Quick Aside: The Pipe Operator (%>%)
+========================================================
+class: small-code
+
+```{r}
+library(magrittr)
+
+# pipe
+vals %>%
+  sum() %>%
+  sqrt() %>%
+  round(3)
+```
+
+tidyverse: data cleaning with dplyr 
+========================================================
+class: small-code
+
+- mpg example data
+
+```{r}
+nrow(mpg)
+str(mpg)
+```
+
+tidyverse: data cleaning with dplyr 
+========================================================
+class: small-code
+
+- select only model, displ, hwy columns
+
+```{r}
+new <- mpg %>%
+  select(model, displ, hwy)
+
+head(new, 4)
+```
+
+
+tidyverse: data cleaning with dplyr 
+========================================================
+class: small-code
+
+- select only model, displ, hwy columns
+- get column that is square root of displ
+
+```{r}
+new <- mpg %>%
+  select(model, displ, hwy) %>%
+  mutate(
+    # make new squared variable
+    displ_sqrd = displ^2,
+  )
+
+head(new, 4)
+```
+
+
+tidyverse: data cleaning with dplyr 
+========================================================
+class: small-code
+
+- select only model, displ, hwyl columns
+- get column that is square root of displ
+- filter those who have hwy < 14
+- arrange by desc hwy
+
+```{r}
+new <- mpg %>%
+  select(model, displ, hwy) %>%
+  mutate(
+    # make new squared variable
+    displ_sqrd = displ^2,
+  ) %>%
+  filter(hwy < 14) %>%
+  arrange(desc(hwy))
+
+head(new, 4)
+```
+
+tidyverse: data cleaning with dplyr 
+========================================================
+class: small-code
+
+- `group_by()` and `summarise()`
+
+```{r}
+mpg %>%
+  group_by(year) %>%
+  summarize(
+    count = n(),
+    distinct = n_distinct(manufacturer, cyl),
+    avg_cty = mean(cty),
+    max_hwy = max(hwy)
+  )
+```
+
+tidyverse: joining data sets with dplyr 
+========================================================
+
+<center>
+![alt text](joins.png)
+</center>
+
+
+Resources
+========================================================
+
+- These materials will be posted to teams
+- Data wrangling cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+- Questions? Reach out to myself or Mike on teams
+- Create an R help channel on teams
+
+Exercises
+========================================================
+
+1. Check out the structure of the `iris` dataset. How many numeric columns does it have?
+2. Make a `table()` of the Species column. How many of each flower type are there?
+3. Group the data frame by Species then summarise to find the mean of Sepal.Length. What is the mean Sepal.Length of versicolor?
+4. Make a new column called "new_col" that is Sepal.Length/ Sepal.Width (use `mutate()`)
+
+Answers to Exercises
+========================================================
+class: small-code
+
+1. Check out the structure of the `iris` dataset. How many numeric columns does it have?
+
+There are 4 numeric columns
+
+```{r}
+str(iris)
+```
+
+Answers to Exercises
+========================================================
+class: small-code
+
+2. Make a `table()` of the Species column. How many of each flower type are there?
+
+```{r}
+table(iris$Species)
+```
+
+another "tidyverse" style option:
+
+```{r}
+iris %>%
+  select(Species) %>%
+  table()
+```
+
+Answers to Exercises
+========================================================
+class: small-code
+
+a 3rd option
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  count()
+```
+
+a FOURTH option!
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(n = n())
+```
+
+Answers to Exercises
+========================================================
+class: small-code
+
+3. Group the data frame by Species then summarise to find the mean of Sepal.Length. What is the mean Sepal.Length of versicolor?
+
+The mean Sepal Length of versicolor is  5.94
+
+```{r}
+iris %>% 
+  group_by(Species) %>%
+  summarise(mean_sepal_length = mean(Sepal.Length))
+```
+
+Answers to Exercises
+========================================================
+class: small-code
+
+4. Make a new column called "new_col" that is Sepal.Length/ Sepal.Width (use `mutate()`)
+
+```{r}
+x <- iris %>% 
+  mutate(new_col = Sepal.Length/ Sepal.Width)
+
+# just showing first 5 observations
+head(x, n = 5)
+```
+
+Thanks!
+========================================================
+
+Questions?
+
